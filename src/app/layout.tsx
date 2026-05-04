@@ -1,22 +1,15 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { SessionProvider } from "next-auth/react";
-import { auth } from "@/lib/auth";
 
 export const metadata: Metadata = {
   title: "Notícia PT — Leia mais. Entenda mais.",
-  description: "Improve your Brazilian Portuguese reading with real news articles and AI-powered questions.",
+  description: "Melhore seu português com artigos reais e perguntas geradas por IA.",
 };
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const session = await auth();
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR">
-      <body>
-        <SessionProvider session={session}>
-          {children}
-        </SessionProvider>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
