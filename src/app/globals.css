@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #f8f7f4;
+  color: #1e293b;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.article-body {
+  font-family: Georgia, serif;
+  font-size: 1.05rem;
+  line-height: 1.85;
+  color: #2d3748;
+}
+
+.article-body p {
+  margin-bottom: 1.25rem;
+}
+
+.highlight-pulse {
+  animation: pulse-bg 1.5s ease-in-out;
+}
+
+@keyframes pulse-bg {
+  0% { background-color: transparent; }
+  30% { background-color: #dbeafe; }
+  100% { background-color: transparent; }
+}
