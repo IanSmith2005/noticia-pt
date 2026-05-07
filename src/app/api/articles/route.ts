@@ -1,23 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { fetchArticleList, fetchArticleContent, estimateReadingMinutes, assignDifficulty } from "@/lib/articles";
 
+export const maxDuration = 30;
+
 export async function GET(req: NextRequest) {
   const topic = req.nextUrl.searchParams.get("topic") || "random";
-  const difficulty = req.nextUrl.searchParams.get("difficulty") || null;
 
   try {
-    const list = await fetchArticleList(topic, 20);
-    const articles = [];
+    const list = await fetchArticleList(topic, 12);
 
-    for (const meta of list.slice(0, 8)) {
-      try {
+    const settled = await Promise.allSettled(
+      list.slice(0, 6).map(async (meta) => {
         const content = await fetchArticleContent(meta.link);
-        const mins = estimateReadingMinutes(content);
-        const diff = assignDifficulty(content);
-
-        if (difficulty && diff !== difficulty) continue;
-
-        articles.push({
+        return {
           id: Buffer.from(meta.link).toString("base64url").slice(0, 20),
           title: meta.title,
           source: meta.source,
@@ -25,17 +20,17 @@ export async function GET(req: NextRequest) {
           publishedAt: meta.pubDate,
           content,
           topic: meta.topic,
-          difficulty: diff,
-          estimatedMinutes: mins,
-        });
+          difficulty: assignDifficulty(content),
+          estimatedMinutes: estimateReadingMinutes(content),
+        };
+      })
+    );
 
-        if (articles.length >= 3) break;
-      } catch {
-        // skip articles that fail to fetch
-      }
-    }
+    const articles = settled
+      .filter((r) => r.status === "fulfilled")
+      .map((r) => (r as PromiseFulfilledResult<unknown>).value);
 
-    return NextResponse.json(articles);
+    return NextResponse.json(articles.slice(0, 5));
   } catch (err) {
     return NextResponse.json({ error: String(err) }, { status: 500 });
   }
