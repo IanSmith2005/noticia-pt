@@ -5,12 +5,14 @@ import { useRouter } from "next/navigation";
 
 const TOPICS = [
   { value: "random", label: "Aleatório", emoji: "🎲" },
-  { value: "world", label: "Mundo", emoji: "🌍" },
-  { value: "business", label: "Economia", emoji: "📈" },
-  { value: "technology", label: "Tecnologia", emoji: "💻" },
-  { value: "science", label: "Ciência", emoji: "🔬" },
-  { value: "politics", label: "Política", emoji: "🏛️" },
-  { value: "culture", label: "Cultura", emoji: "🎭" },
+  { value: "internacional", label: "Mundo", emoji: "🌍" },
+  { value: "economia", label: "Economia", emoji: "📈" },
+  { value: "politica", label: "Política", emoji: "🏛️" },
+  { value: "saude", label: "Saúde", emoji: "🏥" },
+  { value: "educacao", label: "Educação", emoji: "🎓" },
+  { value: "esportes", label: "Esportes", emoji: "⚽" },
+  { value: "justica", label: "Justiça", emoji: "⚖️" },
+  { value: "direitos-humanos", label: "Direitos Humanos", emoji: "🤝" },
 ];
 
 const DIFFICULTIES = [
