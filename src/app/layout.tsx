@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Notícia PT — Leia mais. Entenda mais.",
-  description: "Melhore seu português com artigos reais e perguntas geradas por IA.",
+  title: "Notícia — Read smarter",
+  description: "Improve your reading comprehension with real news articles and AI-powered questions. Available in Portuguese and Dutch.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR">
+    <html lang="en">
       <body>{children}</body>
     </html>
   );

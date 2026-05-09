@@ -1,4 +1,5 @@
 import Parser from "rss-parser";
+import type { LanguageConfig } from "@/config/languages";
 
 export type ArticleMeta = {
   title: string;
@@ -11,7 +12,7 @@ export type ArticleMeta = {
 const BROWSER_HEADERS: Record<string, string> = {
   "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
   "Accept": "application/xml,application/xhtml+xml,text/html,text/xml;q=0.9,*/*;q=0.8",
-  "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8",
+  "Accept-Language": "pt-BR,pt;q=0.9,nl;q=0.8,en;q=0.7",
 };
 
 const parser = new Parser({
@@ -19,22 +20,10 @@ const parser = new Parser({
   timeout: 10000,
 });
 
-const RSS_FEEDS: { url: string; source: string; topic: string }[] = [
-  { url: "https://agenciabrasil.ebc.com.br/rss/ultimasnoticias/feed.xml", source: "Agência Brasil", topic: "geral" },
-  { url: "https://agenciabrasil.ebc.com.br/rss/internacional/feed.xml", source: "Agência Brasil", topic: "internacional" },
-  { url: "https://agenciabrasil.ebc.com.br/rss/economia/feed.xml", source: "Agência Brasil", topic: "economia" },
-  { url: "https://agenciabrasil.ebc.com.br/rss/politica/feed.xml", source: "Agência Brasil", topic: "politica" },
-  { url: "https://agenciabrasil.ebc.com.br/rss/saude/feed.xml", source: "Agência Brasil", topic: "saude" },
-  { url: "https://agenciabrasil.ebc.com.br/rss/educacao/feed.xml", source: "Agência Brasil", topic: "educacao" },
-  { url: "https://agenciabrasil.ebc.com.br/rss/esportes/feed.xml", source: "Agência Brasil", topic: "esportes" },
-  { url: "https://agenciabrasil.ebc.com.br/rss/justica/feed.xml", source: "Agência Brasil", topic: "justica" },
-  { url: "https://agenciabrasil.ebc.com.br/rss/direitos-humanos/feed.xml", source: "Agência Brasil", topic: "direitos-humanos" },
-];
-
-export async function fetchArticleList(topic: string = "random", limit = 10): Promise<ArticleMeta[]> {
+export async function fetchArticleList(config: LanguageConfig, topic: string = "random", limit = 10): Promise<ArticleMeta[]> {
   const feeds = topic === "random"
-    ? RSS_FEEDS
-    : RSS_FEEDS.filter((f) => f.topic === topic);
+    ? config.feeds
+    : config.feeds.filter((f) => f.topic === topic);
 
   const results: ArticleMeta[] = [];
 
@@ -67,6 +56,7 @@ export async function fetchArticleContent(url: string): Promise<string> {
     const res = await fetch(url, {
       headers: BROWSER_HEADERS,
       signal: AbortSignal.timeout(10000),
+      redirect: "follow",
     });
     const html = await res.text();
 

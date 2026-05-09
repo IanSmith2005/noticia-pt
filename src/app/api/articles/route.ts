@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { fetchArticleList, fetchArticleContent, estimateReadingMinutes, assignDifficulty } from "@/lib/articles";
+import { getConfig } from "@/config/languages";
 
 export const maxDuration = 30;
 
 export async function GET(req: NextRequest) {
   const topic = req.nextUrl.searchParams.get("topic") || "random";
+  const lang = req.nextUrl.searchParams.get("lang");
+  const config = getConfig(lang);
 
   try {
-    const list = await fetchArticleList(topic, 12);
+    const list = await fetchArticleList(config, topic, 12);
 
     const settled = await Promise.allSettled(
       list.slice(0, 6).map(async (meta) => {

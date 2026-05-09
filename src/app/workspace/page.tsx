@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { LANGUAGES, DEFAULT_LANG, type LangCode } from "@/config/languages";
 
 type Question = {
   idx: number;
@@ -26,16 +27,10 @@ type Article = {
   content: string;
 };
 
-const RESULT_COLORS = {
+const RESULT_BORDER_BG = {
   correct: "border-green-400 bg-green-50",
   partly_correct: "border-yellow-400 bg-yellow-50",
   incorrect: "border-red-400 bg-red-50",
-};
-
-const RESULT_LABELS = {
-  correct: "✓ Correto",
-  partly_correct: "◑ Parcialmente correto",
-  incorrect: "✗ Incorreto",
 };
 
 const RESULT_TEXT = {
@@ -46,6 +41,7 @@ const RESULT_TEXT = {
 
 export default function WorkspacePage() {
   const router = useRouter();
+  const [lang, setLang] = useState<LangCode>(DEFAULT_LANG);
   const [article, setArticle] = useState<Article | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [difficulty, setDifficulty] = useState("medium");
@@ -64,6 +60,7 @@ export default function WorkspacePage() {
     setArticle(data.article);
     setQuestions(data.questions);
     setDifficulty(data.difficulty);
+    setLang(data.lang || DEFAULT_LANG);
     setAnswers(new Array(data.questions.length).fill(""));
   }, [router]);
 
@@ -97,12 +94,14 @@ export default function WorkspacePage() {
     setActiveTab("questions");
   }
 
+  const config = LANGUAGES[lang];
+
   if (!article) {
     return (
       <div className="min-h-screen bg-surface flex items-center justify-center">
         <div className="text-center">
           <div className="text-4xl mb-4">📰</div>
-          <p className="text-slate-500">Preparando seu artigo...</p>
+          <p className="text-slate-500">{config.ui.loadingArticle}</p>
         </div>
       </div>
     );
@@ -116,18 +115,20 @@ export default function WorkspacePage() {
     hard: "text-red-600 bg-red-100",
   };
 
+  const localeMap: Record<LangCode, string> = { pt: "pt-BR", nl: "nl-NL" };
+
   return (
     <div className="min-h-screen bg-surface flex flex-col">
       {/* Top Nav */}
       <nav className="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-10">
         <button onClick={() => router.push("/")} className="flex items-center gap-2 font-bold text-navy text-lg">
-          <span>📰</span> Notícia PT
+          <span>{config.flag}</span> {config.brand}
         </button>
         <div className="flex items-center gap-3">
           <span className={`text-xs font-semibold px-2 py-1 rounded-full ${difficultyColor[difficulty] || "text-slate-600 bg-slate-100"}`}>
             {difficulty.toUpperCase()}
           </span>
-          <span className="text-xs text-slate-400">⏱ {article.estimatedMinutes} min</span>
+          <span className="text-xs text-slate-400">⏱ {article.estimatedMinutes} {config.ui.minutes}</span>
         </div>
       </nav>
 
@@ -137,13 +138,13 @@ export default function WorkspacePage() {
           onClick={() => setActiveTab("article")}
           className={`flex-1 py-3 text-sm font-semibold transition-colors ${activeTab === "article" ? "text-accent border-b-2 border-accent" : "text-slate-400"}`}
         >
-          Artigo
+          {config.ui.articleTab}
         </button>
         <button
           onClick={() => setActiveTab("questions")}
           className={`flex-1 py-3 text-sm font-semibold transition-colors ${activeTab === "questions" ? "text-accent border-b-2 border-accent" : "text-slate-400"}`}
         >
-          Perguntas ({questions.length})
+          {config.ui.questionsTab} ({questions.length})
         </button>
       </div>
 
@@ -157,10 +158,10 @@ export default function WorkspacePage() {
               <div className="flex flex-wrap gap-3 text-sm text-slate-500">
                 <span className="font-medium text-slate-700">{article.source}</span>
                 <span>·</span>
-                <span>{new Date(article.publishedAt).toLocaleDateString("pt-BR", { day: "numeric", month: "long", year: "numeric" })}</span>
+                <span>{new Date(article.publishedAt).toLocaleDateString(localeMap[lang], { day: "numeric", month: "long", year: "numeric" })}</span>
                 <span>·</span>
                 <a href={article.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
-                  Ver original ↗
+                  {config.ui.seeOriginal}
                 </a>
               </div>
             </div>
@@ -184,17 +185,17 @@ export default function WorkspacePage() {
             {/* Score Summary */}
             {score !== null && (
               <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-                <h3 className="font-bold text-navy text-lg mb-1">Resultado: {score}%</h3>
+                <h3 className="font-bold text-navy text-lg mb-1">{config.ui.result}: {score}%</h3>
                 <div className="flex gap-3 text-sm mt-2">
-                  <span className="text-green-600">✓ {results?.filter((r) => r.result === "correct").length} corretas</span>
-                  <span className="text-yellow-600">◑ {results?.filter((r) => r.result === "partly_correct").length} parciais</span>
-                  <span className="text-red-600">✗ {results?.filter((r) => r.result === "incorrect").length} incorretas</span>
+                  <span className="text-green-600">✓ {results?.filter((r) => r.result === "correct").length} {config.ui.correct}</span>
+                  <span className="text-yellow-600">◑ {results?.filter((r) => r.result === "partly_correct").length} {config.ui.partial}</span>
+                  <span className="text-red-600">✗ {results?.filter((r) => r.result === "incorrect").length} {config.ui.incorrect}</span>
                 </div>
                 <button
                   onClick={() => router.push("/")}
                   className="mt-4 w-full py-2 rounded-xl border-2 border-accent text-accent font-semibold text-sm hover:bg-accent hover:text-white transition-all"
                 >
-                  Novo artigo →
+                  {config.ui.newArticle}
                 </button>
               </div>
             )}
@@ -205,17 +206,17 @@ export default function WorkspacePage() {
               return (
                 <div
                   key={i}
-                  className={`bg-white rounded-2xl p-5 border-2 shadow-sm transition-all ${result ? RESULT_COLORS[result.result] : "border-slate-200"}`}
+                  className={`bg-white rounded-2xl p-5 border-2 shadow-sm transition-all ${result ? RESULT_BORDER_BG[result.result] : "border-slate-200"}`}
                 >
                   <div className="flex items-start justify-between mb-3">
                     <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                      Pergunta {i + 1}
+                      {config.ui.questionLabel} {i + 1}
                     </span>
                     <button
                       onClick={() => highlightParagraph(q.relatedParagraph)}
                       className="text-xs text-accent hover:underline"
                     >
-                      Ver trecho →
+                      {config.ui.seeExcerpt}
                     </button>
                   </div>
 
@@ -230,14 +231,16 @@ export default function WorkspacePage() {
                         updated[i] = e.target.value;
                         setAnswers(updated);
                       }}
-                      placeholder={difficulty === "easy" ? "Write your answer here..." : "Escreva sua resposta aqui..."}
+                      placeholder={difficulty === "easy" ? "Write your answer here..." : config.ui.answerPlaceholder}
                       className="w-full text-sm border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent resize-none bg-slate-50"
                     />
                   ) : (
                     <div className="space-y-2">
                       {result && (
                         <span className={`text-xs font-semibold ${RESULT_TEXT[result.result]}`}>
-                          {RESULT_LABELS[result.result]}
+                          {result.result === "correct" ? config.ui.correctLabel
+                          : result.result === "partly_correct" ? config.ui.partialLabel
+                          : config.ui.incorrectLabel}
                         </span>
                       )}
                       {answers[i] && (
@@ -250,7 +253,7 @@ export default function WorkspacePage() {
                       )}
                       {result?.betterAnswer && result.result !== "correct" && (
                         <div className="text-xs text-slate-600 bg-blue-50 rounded-lg p-2 border border-blue-100">
-                          <span className="font-semibold text-blue-800">Better answer: </span>
+                          <span className="font-semibold text-blue-800">{config.ui.betterAnswer}: </span>
                           {result.betterAnswer}
                         </div>
                       )}
@@ -266,7 +269,7 @@ export default function WorkspacePage() {
       {/* Bottom Action Bar */}
       <div className="bg-white border-t border-slate-200 px-4 py-3 flex items-center justify-between sticky bottom-0 z-10">
         <div className="text-sm text-slate-400">
-          {answers.filter((a) => a.trim()).length}/{questions.length} respondidas
+          {config.ui.answeredCount(answers.filter((a) => a.trim()).length, questions.length)}
         </div>
         {!results ? (
           <button
@@ -274,14 +277,14 @@ export default function WorkspacePage() {
             disabled={checking || answers.every((a) => !a.trim())}
             className="px-6 py-2 bg-accent hover:bg-accent-dark text-white font-semibold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm"
           >
-            {checking ? "Verificando com IA..." : "Verificar Respostas →"}
+            {checking ? config.ui.checking : config.ui.checkAnswers}
           </button>
         ) : (
           <button
             onClick={() => router.push("/")}
             className="px-6 py-2 bg-accent hover:bg-accent-dark text-white font-semibold rounded-xl transition-all text-sm"
           >
-            Novo Artigo →
+            {config.ui.newArticle}
           </button>
         )}
       </div>

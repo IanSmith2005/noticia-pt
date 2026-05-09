@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import type { LanguageConfig, Difficulty } from "@/config/languages";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -17,37 +18,20 @@ export type AnswerResult = {
   betterAnswer: string;
 };
 
-const DIFFICULTY_PROMPTS = {
-  easy: `Generate 4 comprehension questions in ENGLISH about this Brazilian Portuguese news article.
-Focus on: basic facts, who/what/where/when, main idea.
-Keep questions simple and direct.`,
-
-  medium: `Generate 5 comprehension questions in PORTUGUESE (Brazilian) about this news article.
-Focus on: causes and effects, connections between ideas, what quotes mean, implications.
-Questions should require reading carefully, not just skimming.`,
-
-  hard: `Generate 6 critical thinking questions in PORTUGUESE (Brazilian) about this news article.
-Focus on: assumptions made, missing perspectives, bias detection, predicting consequences, evaluating arguments.
-Questions should challenge the reader to think beyond the text.`,
-};
-
 export async function generateQuestions(
+  config: LanguageConfig,
   articleContent: string,
   articleTitle: string,
-  difficulty: "easy" | "medium" | "hard"
+  difficulty: Difficulty
 ): Promise<Question[]> {
-  const prompt = DIFFICULTY_PROMPTS[difficulty];
-
   const message = await anthropic.messages.create({
     model: "claude-sonnet-4-6",
     max_tokens: 1024,
-    system: `You are an educational tool that helps people improve their Brazilian Portuguese reading comprehension.
-Return ONLY a valid JSON array of question objects. No explanation, no markdown, just the JSON array.
-Each object must have: idx (number starting at 1), text (string), relatedParagraph (number, 1-indexed guess), type (one of: fact, interpretation, critical, vocabulary).`,
+    system: config.claude.systemPrompt,
     messages: [
       {
         role: "user",
-        content: `Article title: ${articleTitle}\n\nArticle content:\n${articleContent.slice(0, 4000)}\n\n${prompt}`,
+        content: `Article title: ${articleTitle}\n\nArticle content:\n${articleContent.slice(0, 4000)}\n\n${config.claude.questionPrompts[difficulty]}`,
       },
     ],
   });
@@ -66,7 +50,7 @@ export async function checkAnswers(
   questions: { text: string }[],
   answers: string[]
 ): Promise<AnswerResult[]> {
-  const qa = questions.map((q, i) => `Q${i + 1}: ${q.text}\nA${i + 1}: ${answers[i] || "(sem resposta)"}`).join("\n\n");
+  const qa = questions.map((q, i) => `Q${i + 1}: ${q.text}\nA${i + 1}: ${answers[i] || "(no answer)"}`).join("\n\n");
 
   const message = await anthropic.messages.create({
     model: "claude-sonnet-4-6",
