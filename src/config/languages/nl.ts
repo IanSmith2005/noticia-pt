@@ -70,7 +70,18 @@ export const nlConfig: LanguageConfig = {
     t = t.replace(/^NOS\s+Nieuws[\s\S]{0,80}?\d{1,2}:\d{2}\s*/i, "");
     // Strip "(opent in nieuw venster)" link annotations
     t = t.replace(/\s*\(opent in nieuw venster\)/gi, "");
-    // Cut off at NOS-specific end-of-article markers (share buttons + related articles)
+
+    // Cut off at NOS related-articles section. Each entry in that section starts with:
+    // "[weekday] [day] [month], [HH:MM]" — e.g. "maandag 20 april, 04:54"
+    const relatedRegex = /(maandag|dinsdag|woensdag|donderdag|vrijdag|zaterdag|zondag)\s+\d{1,2}\s+(januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december),\s*\d{1,2}:\d{2}/i;
+
+    // Skip first 200 chars (could be article's own dateline) when searching for the cutoff
+    const searchFrom = 200;
+    const tail = t.slice(searchFrom);
+    const match = tail.search(relatedRegex);
+    if (match >= 0) t = t.slice(0, searchFrom + match);
+
+    // Also cut at known textual markers (in case they appear without related articles)
     const markers = ["Deel artikel:", "Meer bekijken?"];
     let cutAt = t.length;
     for (const m of markers) {
