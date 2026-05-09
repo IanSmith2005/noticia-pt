@@ -1,4 +1,6 @@
 import Parser from "rss-parser";
+import { extractFromHtml } from "@extractus/article-extractor";
+import { decode } from "he";
 import type { LanguageConfig } from "@/config/languages";
 
 export type ArticleMeta = {
@@ -52,34 +54,42 @@ export async function fetchArticleList(config: LanguageConfig, topic: string = "
 }
 
 export async function fetchArticleContent(url: string): Promise<string> {
-  try {
-    const res = await fetch(url, {
-      headers: BROWSER_HEADERS,
-      signal: AbortSignal.timeout(10000),
-      redirect: "follow",
-    });
-    const html = await res.text();
+  const res = await fetch(url, {
+    headers: BROWSER_HEADERS,
+    signal: AbortSignal.timeout(10000),
+    redirect: "follow",
+  });
+  const html = await res.text();
 
-    const text = html
+  // Run Mozilla Readability to find the actual article body (not nav/ads/footer)
+  const article = await extractFromHtml(html, url);
+
+  if (article?.content) {
+    const text = decode(
+      article.content
+        .replace(/<[^>]+>/g, " ")
+        .replace(/\s{2,}/g, " ")
+        .trim()
+    );
+    if (text.length >= 300) return text.slice(0, 8000);
+  }
+
+  // Fallback: tag-strip with proper entity decoding
+  const fallback = decode(
+    html
       .replace(/<script[\s\S]*?<\/script>/gi, "")
       .replace(/<style[\s\S]*?<\/style>/gi, "")
       .replace(/<nav[\s\S]*?<\/nav>/gi, "")
       .replace(/<header[\s\S]*?<\/header>/gi, "")
       .replace(/<footer[\s\S]*?<\/footer>/gi, "")
+      .replace(/<aside[\s\S]*?<\/aside>/gi, "")
       .replace(/<[^>]+>/g, " ")
-      .replace(/&nbsp;/g, " ")
-      .replace(/&amp;/g, "&")
-      .replace(/&lt;/g, "<")
-      .replace(/&gt;/g, ">")
-      .replace(/&quot;/g, '"')
       .replace(/\s{2,}/g, " ")
-      .trim();
+      .trim()
+  );
 
-    if (text.length < 300) throw new Error("Content too short");
-    return text.slice(0, 8000);
-  } catch (err) {
-    throw new Error(`Could not fetch article: ${err}`);
-  }
+  if (fallback.length < 300) throw new Error("Content too short");
+  return fallback.slice(0, 8000);
 }
 
 export function estimateReadingMinutes(text: string): number {
