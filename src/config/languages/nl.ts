@@ -64,6 +64,22 @@ export const nlConfig: LanguageConfig = {
     hard: { label: "Moeilijk", desc: "Vragen in het Nederlands · Kritisch denken", questionLang: "native" },
   },
 
+  cleanContent: (text) => {
+    let t = text;
+    // Strip leading NOS dateline like "NOS Nieuws • woensdag, 16:36 "
+    t = t.replace(/^NOS\s+Nieuws[\s\S]{0,80}?\d{1,2}:\d{2}\s*/i, "");
+    // Strip "(opent in nieuw venster)" link annotations
+    t = t.replace(/\s*\(opent in nieuw venster\)/gi, "");
+    // Cut off at NOS-specific end-of-article markers (share buttons + related articles)
+    const markers = ["Deel artikel:", "Meer bekijken?"];
+    let cutAt = t.length;
+    for (const m of markers) {
+      const idx = t.indexOf(m);
+      if (idx > 0 && idx < cutAt) cutAt = idx;
+    }
+    return t.slice(0, cutAt).trim();
+  },
+
   claude: {
     systemPrompt: `You are an educational tool that helps people improve their Dutch (Netherlands Dutch) reading comprehension.
 Return ONLY a valid JSON array of question objects. No explanation, no markdown, just the JSON array.

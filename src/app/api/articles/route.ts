@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
 
     const settled = await Promise.allSettled(
       list.slice(0, 6).map(async (meta) => {
-        const content = await fetchArticleContent(meta.link);
+        const content = await fetchArticleContent(meta.link, config.cleanContent);
         return {
           id: Buffer.from(meta.link).toString("base64url").slice(0, 20),
           title: meta.title,

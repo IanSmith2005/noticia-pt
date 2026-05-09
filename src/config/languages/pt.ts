@@ -66,6 +66,8 @@ export const ptConfig: LanguageConfig = {
     hard: { label: "Difícil", desc: "Perguntas em português · Pensamento crítico", questionLang: "native" },
   },
 
+  cleanContent: (text) => text.trim(),
+
   claude: {
     systemPrompt: `You are an educational tool that helps people improve their Brazilian Portuguese reading comprehension.
 Return ONLY a valid JSON array of question objects. No explanation, no markdown, just the JSON array.

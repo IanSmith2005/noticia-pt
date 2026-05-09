@@ -53,7 +53,10 @@ export async function fetchArticleList(config: LanguageConfig, topic: string = "
   return results.sort(() => Math.random() - 0.5).slice(0, limit);
 }
 
-export async function fetchArticleContent(url: string): Promise<string> {
+export async function fetchArticleContent(
+  url: string,
+  cleanup: (text: string) => string = (t) => t.trim()
+): Promise<string> {
   const res = await fetch(url, {
     headers: BROWSER_HEADERS,
     signal: AbortSignal.timeout(10000),
@@ -65,27 +68,31 @@ export async function fetchArticleContent(url: string): Promise<string> {
   const article = await extractFromHtml(html, url);
 
   if (article?.content) {
-    const text = decode(
-      article.content
-        .replace(/<[^>]+>/g, " ")
-        .replace(/\s{2,}/g, " ")
-        .trim()
+    const text = cleanup(
+      decode(
+        article.content
+          .replace(/<[^>]+>/g, " ")
+          .replace(/\s{2,}/g, " ")
+          .trim()
+      )
     );
     if (text.length >= 300) return text.slice(0, 8000);
   }
 
   // Fallback: tag-strip with proper entity decoding
-  const fallback = decode(
-    html
-      .replace(/<script[\s\S]*?<\/script>/gi, "")
-      .replace(/<style[\s\S]*?<\/style>/gi, "")
-      .replace(/<nav[\s\S]*?<\/nav>/gi, "")
-      .replace(/<header[\s\S]*?<\/header>/gi, "")
-      .replace(/<footer[\s\S]*?<\/footer>/gi, "")
-      .replace(/<aside[\s\S]*?<\/aside>/gi, "")
-      .replace(/<[^>]+>/g, " ")
-      .replace(/\s{2,}/g, " ")
-      .trim()
+  const fallback = cleanup(
+    decode(
+      html
+        .replace(/<script[\s\S]*?<\/script>/gi, "")
+        .replace(/<style[\s\S]*?<\/style>/gi, "")
+        .replace(/<nav[\s\S]*?<\/nav>/gi, "")
+        .replace(/<header[\s\S]*?<\/header>/gi, "")
+        .replace(/<footer[\s\S]*?<\/footer>/gi, "")
+        .replace(/<aside[\s\S]*?<\/aside>/gi, "")
+        .replace(/<[^>]+>/g, " ")
+        .replace(/\s{2,}/g, " ")
+        .trim()
+    )
   );
 
   if (fallback.length < 300) throw new Error("Content too short");

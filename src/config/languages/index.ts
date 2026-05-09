@@ -62,6 +62,7 @@ export type LanguageConfig = {
     systemPrompt: string;
     questionPrompts: Record<Difficulty, string>;
   };
+  cleanContent: (text: string) => string;
 };
 
 export const LANGUAGES: Record<LangCode, LanguageConfig> = {
