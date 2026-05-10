@@ -118,19 +118,36 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-grain relative overflow-hidden">
-      {/* Animated background blobs — slow ambient drift */}
-      <motion.div
-        className="pointer-events-none absolute -top-32 -left-32 h-96 w-96 rounded-full bg-amber-200/30 blur-3xl"
-        aria-hidden
-        animate={{ x: [0, 30, -10, 0], y: [0, 20, -15, 0], scale: [1, 1.1, 0.95, 1] }}
-        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="pointer-events-none absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-blue-200/30 blur-3xl"
-        aria-hidden
-        animate={{ x: [0, -25, 15, 0], y: [0, -20, 10, 0], scale: [1, 0.95, 1.1, 1] }}
-        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
-      />
+      {/* Aurora — three large gradient washes drifting across the page */}
+      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden" aria-hidden>
+        <motion.div
+          className="absolute h-[60vh] w-[60vw] rounded-full blur-[120px]"
+          style={{ background: "radial-gradient(circle, rgba(245, 158, 11, 0.5), transparent 70%)" }}
+          animate={{
+            x: ["-15%", "30%", "-10%", "-15%"],
+            y: ["-10%", "20%", "10%", "-10%"],
+          }}
+          transition={{ duration: 24, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute h-[55vh] w-[55vw] rounded-full blur-[120px]"
+          style={{ background: "radial-gradient(circle, rgba(37, 99, 235, 0.45), transparent 70%)", right: 0 }}
+          animate={{
+            x: ["20%", "-10%", "30%", "20%"],
+            y: ["50%", "20%", "60%", "50%"],
+          }}
+          transition={{ duration: 28, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute h-[50vh] w-[50vw] rounded-full blur-[120px]"
+          style={{ background: "radial-gradient(circle, rgba(167, 139, 250, 0.35), transparent 70%)" }}
+          animate={{
+            x: ["60%", "20%", "70%", "60%"],
+            y: ["-20%", "40%", "10%", "-20%"],
+          }}
+          transition={{ duration: 32, repeat: Infinity, ease: "easeInOut" }}
+        />
+      </div>
 
       {/* Top bar */}
       <header className="relative max-w-5xl mx-auto px-6 pt-6 flex items-center justify-between">
