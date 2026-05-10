@@ -2,7 +2,9 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { Newspaper, Clock, ExternalLink, ArrowRight, BookOpen, ListChecks, CheckCircle2, CircleSlash, CircleDot } from "lucide-react";
 import { LANGUAGES, DEFAULT_LANG, type LangCode } from "@/config/languages";
+import { Flag } from "@/components/Flag";
 
 type Question = {
   idx: number;
@@ -98,9 +100,9 @@ export default function WorkspacePage() {
 
   if (!article) {
     return (
-      <div className="min-h-screen bg-surface flex items-center justify-center">
+      <div className="min-h-screen bg-grain flex items-center justify-center">
         <div className="text-center">
-          <div className="text-4xl mb-4">📰</div>
+          <Newspaper className="h-10 w-10 text-slate-300 mx-auto mb-3" strokeWidth={1.5} />
           <p className="text-slate-500">{config.ui.loadingArticle}</p>
         </div>
       </div>
@@ -118,50 +120,57 @@ export default function WorkspacePage() {
   const localeMap: Record<LangCode, string> = { pt: "pt-BR", nl: "nl-NL" };
 
   return (
-    <div className="min-h-screen bg-surface flex flex-col">
+    <div className="min-h-screen bg-grain flex flex-col">
       {/* Top Nav */}
-      <nav className="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-10">
-        <button onClick={() => router.push("/")} className="flex items-center gap-2 font-bold text-navy text-lg">
-          <span>{config.flag}</span> {config.brand}
+      <nav className="bg-white border-b border-line px-4 py-3 flex items-center justify-between sticky top-0 z-10">
+        <button onClick={() => router.push("/")} className="flex items-center gap-2.5 group">
+          <span className="inline-flex items-center justify-center h-8 w-8 rounded-lg bg-slate-100 text-navy">
+            <Newspaper className="h-4 w-4" strokeWidth={2} />
+          </span>
+          <span className="font-serif font-bold text-navy text-lg group-hover:text-slate-700 transition-colors">{config.brand}</span>
         </button>
         <div className="flex items-center gap-3">
-          <span className={`text-xs font-semibold px-2 py-1 rounded-full ${difficultyColor[difficulty] || "text-slate-600 bg-slate-100"}`}>
+          <Flag code={lang} className="h-3.5 w-5" />
+          <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${difficultyColor[difficulty] || "text-slate-600 bg-slate-100"}`}>
             {difficulty.toUpperCase()}
           </span>
-          <span className="text-xs text-slate-400">⏱ {article.estimatedMinutes} {config.ui.minutes}</span>
+          <span className="text-xs text-slate-400 inline-flex items-center gap-1">
+            <Clock className="h-3.5 w-3.5" /> {article.estimatedMinutes} {config.ui.minutes}
+          </span>
         </div>
       </nav>
 
       {/* Mobile Tabs */}
-      <div className="md:hidden flex border-b border-slate-200 bg-white">
+      <div className="md:hidden flex border-b border-line bg-white">
         <button
           onClick={() => setActiveTab("article")}
-          className={`flex-1 py-3 text-sm font-semibold transition-colors ${activeTab === "article" ? "text-accent border-b-2 border-accent" : "text-slate-400"}`}
+          className={`flex-1 py-3 text-sm font-semibold inline-flex items-center justify-center gap-2 transition-colors ${activeTab === "article" ? "text-accent border-b-2 border-accent" : "text-slate-400"}`}
         >
-          {config.ui.articleTab}
+          <BookOpen className="h-4 w-4" /> {config.ui.articleTab}
         </button>
         <button
           onClick={() => setActiveTab("questions")}
-          className={`flex-1 py-3 text-sm font-semibold transition-colors ${activeTab === "questions" ? "text-accent border-b-2 border-accent" : "text-slate-400"}`}
+          className={`flex-1 py-3 text-sm font-semibold inline-flex items-center justify-center gap-2 transition-colors ${activeTab === "questions" ? "text-accent border-b-2 border-accent" : "text-slate-400"}`}
         >
-          {config.ui.questionsTab} ({questions.length})
+          <ListChecks className="h-4 w-4" /> {config.ui.questionsTab} ({questions.length})
         </button>
       </div>
 
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Article Panel */}
-        <div className={`${activeTab === "article" ? "flex" : "hidden"} md:flex flex-col w-full md:w-3/5 overflow-y-auto border-r border-slate-200 bg-white`}>
+        <div className={`${activeTab === "article" ? "flex" : "hidden"} md:flex flex-col w-full md:w-3/5 overflow-y-auto border-r border-line bg-white thin-scroll`}>
           <div className="max-w-2xl mx-auto px-6 py-8">
             <div className="mb-6">
-              <h1 className="text-2xl font-bold text-navy leading-tight mb-3">{article.title}</h1>
+              <h1 className="font-serif text-3xl md:text-4xl font-bold text-navy leading-tight mb-3">{article.title}</h1>
               <div className="flex flex-wrap gap-3 text-sm text-slate-500">
                 <span className="font-medium text-slate-700">{article.source}</span>
                 <span>·</span>
                 <span>{new Date(article.publishedAt).toLocaleDateString(localeMap[lang], { day: "numeric", month: "long", year: "numeric" })}</span>
                 <span>·</span>
-                <a href={article.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
-                  {config.ui.seeOriginal}
+                <a href={article.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline inline-flex items-center gap-1">
+                  {config.ui.seeOriginal.replace(/\s*↗\s*$/, "")}
+                  <ExternalLink className="h-3.5 w-3.5" />
                 </a>
               </div>
             </div>
@@ -180,22 +189,28 @@ export default function WorkspacePage() {
         </div>
 
         {/* Questions Panel */}
-        <div className={`${activeTab === "questions" ? "flex" : "hidden"} md:flex flex-col w-full md:w-2/5 overflow-y-auto bg-surface`}>
+        <div className={`${activeTab === "questions" ? "flex" : "hidden"} md:flex flex-col w-full md:w-2/5 overflow-y-auto thin-scroll`}>
           <div className="px-5 py-6 space-y-5">
             {/* Score Summary */}
             {score !== null && (
-              <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-                <h3 className="font-bold text-navy text-lg mb-1">{config.ui.result}: {score}%</h3>
-                <div className="flex gap-3 text-sm mt-2">
-                  <span className="text-green-600">✓ {results?.filter((r) => r.result === "correct").length} {config.ui.correct}</span>
-                  <span className="text-yellow-600">◑ {results?.filter((r) => r.result === "partly_correct").length} {config.ui.partial}</span>
-                  <span className="text-red-600">✗ {results?.filter((r) => r.result === "incorrect").length} {config.ui.incorrect}</span>
+              <div className="bg-white rounded-2xl p-5 border border-line shadow-sm">
+                <h3 className="font-serif font-bold text-navy text-2xl mb-2">{config.ui.result}: {score}%</h3>
+                <div className="flex flex-wrap gap-3 text-sm mt-2">
+                  <span className="inline-flex items-center gap-1.5 text-emerald-700">
+                    <CheckCircle2 className="h-4 w-4" /> {results?.filter((r) => r.result === "correct").length} {config.ui.correct}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 text-amber-700">
+                    <CircleDot className="h-4 w-4" /> {results?.filter((r) => r.result === "partly_correct").length} {config.ui.partial}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 text-rose-700">
+                    <CircleSlash className="h-4 w-4" /> {results?.filter((r) => r.result === "incorrect").length} {config.ui.incorrect}
+                  </span>
                 </div>
                 <button
                   onClick={() => router.push("/")}
-                  className="mt-4 w-full py-2 rounded-xl border-2 border-accent text-accent font-semibold text-sm hover:bg-accent hover:text-white transition-all"
+                  className="mt-4 w-full py-2.5 rounded-xl border-2 border-navy text-navy font-semibold text-sm hover:bg-navy hover:text-white transition-all inline-flex items-center justify-center gap-2"
                 >
-                  {config.ui.newArticle}
+                  {config.ui.newArticle.replace(/\s*→\s*$/, "")} <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
             )}
@@ -206,7 +221,7 @@ export default function WorkspacePage() {
               return (
                 <div
                   key={i}
-                  className={`bg-white rounded-2xl p-5 border-2 shadow-sm transition-all ${result ? RESULT_BORDER_BG[result.result] : "border-slate-200"}`}
+                  className={`bg-white rounded-2xl p-5 border-2 shadow-sm transition-all ${result ? RESULT_BORDER_BG[result.result] : "border-line"}`}
                 >
                   <div className="flex items-start justify-between mb-3">
                     <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
@@ -214,9 +229,10 @@ export default function WorkspacePage() {
                     </span>
                     <button
                       onClick={() => highlightParagraph(q.relatedParagraph)}
-                      className="text-xs text-accent hover:underline"
+                      className="text-xs text-accent hover:underline inline-flex items-center gap-1"
                     >
-                      {config.ui.seeExcerpt}
+                      {config.ui.seeExcerpt.replace(/\s*→\s*$/, "")}
+                      <ArrowRight className="h-3 w-3" />
                     </button>
                   </div>
 
@@ -232,15 +248,18 @@ export default function WorkspacePage() {
                         setAnswers(updated);
                       }}
                       placeholder={difficulty === "easy" ? "Write your answer here..." : config.ui.answerPlaceholder}
-                      className="w-full text-sm border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent resize-none bg-slate-50"
+                      className="w-full text-sm border border-line rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent resize-none bg-slate-50"
                     />
                   ) : (
                     <div className="space-y-2">
                       {result && (
-                        <span className={`text-xs font-semibold ${RESULT_TEXT[result.result]}`}>
-                          {result.result === "correct" ? config.ui.correctLabel
-                          : result.result === "partly_correct" ? config.ui.partialLabel
-                          : config.ui.incorrectLabel}
+                        <span className={`inline-flex items-center gap-1.5 text-xs font-semibold ${RESULT_TEXT[result.result]}`}>
+                          {result.result === "correct" && <CheckCircle2 className="h-3.5 w-3.5" />}
+                          {result.result === "partly_correct" && <CircleDot className="h-3.5 w-3.5" />}
+                          {result.result === "incorrect" && <CircleSlash className="h-3.5 w-3.5" />}
+                          {result.result === "correct" ? config.ui.correctLabel.replace(/^\W+\s*/, "")
+                          : result.result === "partly_correct" ? config.ui.partialLabel.replace(/^\W+\s*/, "")
+                          : config.ui.incorrectLabel.replace(/^\W+\s*/, "")}
                         </span>
                       )}
                       {answers[i] && (
@@ -267,7 +286,7 @@ export default function WorkspacePage() {
       </div>
 
       {/* Bottom Action Bar */}
-      <div className="bg-white border-t border-slate-200 px-4 py-3 flex items-center justify-between sticky bottom-0 z-10">
+      <div className="bg-white border-t border-line px-4 py-3 flex items-center justify-between sticky bottom-0 z-10">
         <div className="text-sm text-slate-400">
           {config.ui.answeredCount(answers.filter((a) => a.trim()).length, questions.length)}
         </div>
@@ -275,16 +294,27 @@ export default function WorkspacePage() {
           <button
             onClick={handleCheckAnswers}
             disabled={checking || answers.every((a) => !a.trim())}
-            className="px-6 py-2 bg-accent hover:bg-accent-dark text-white font-semibold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            className="group px-6 py-2.5 bg-navy hover:bg-slate-800 text-white font-semibold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm inline-flex items-center gap-2"
           >
-            {checking ? config.ui.checking : config.ui.checkAnswers}
+            {checking ? (
+              <>
+                <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
+                {config.ui.checking}
+              </>
+            ) : (
+              <>
+                {config.ui.checkAnswers.replace(/\s*→\s*$/, "")}
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              </>
+            )}
           </button>
         ) : (
           <button
             onClick={() => router.push("/")}
-            className="px-6 py-2 bg-accent hover:bg-accent-dark text-white font-semibold rounded-xl transition-all text-sm"
+            className="group px-6 py-2.5 bg-navy hover:bg-slate-800 text-white font-semibold rounded-xl transition-all text-sm inline-flex items-center gap-2"
           >
-            {config.ui.newArticle}
+            {config.ui.newArticle.replace(/\s*→\s*$/, "")}
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </button>
         )}
       </div>

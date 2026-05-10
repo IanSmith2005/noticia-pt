@@ -19,14 +19,14 @@ export const nlConfig: LanguageConfig = {
   ],
 
   topics: [
-    { value: "random", label: "Willekeurig", emoji: "🎲" },
-    { value: "buitenland", label: "Wereld", emoji: "🌍" },
-    { value: "binnenland", label: "Nederland", emoji: "🇳🇱" },
-    { value: "economie", label: "Economie", emoji: "📈" },
-    { value: "politiek", label: "Politiek", emoji: "🏛️" },
-    { value: "tech", label: "Tech", emoji: "💻" },
-    { value: "cultuur", label: "Cultuur", emoji: "🎭" },
-    { value: "sport", label: "Sport", emoji: "⚽" },
+    { value: "random", label: "Willekeurig", icon: "Shuffle" },
+    { value: "buitenland", label: "Wereld", icon: "Globe" },
+    { value: "binnenland", label: "Nederland", icon: "MapPin" },
+    { value: "economie", label: "Economie", icon: "TrendingUp" },
+    { value: "politiek", label: "Politiek", icon: "Landmark" },
+    { value: "tech", label: "Tech", icon: "Cpu" },
+    { value: "cultuur", label: "Cultuur", icon: "Palette" },
+    { value: "sport", label: "Sport", icon: "Trophy" },
   ],
 
   ui: {

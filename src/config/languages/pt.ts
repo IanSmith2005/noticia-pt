@@ -20,15 +20,15 @@ export const ptConfig: LanguageConfig = {
   ],
 
   topics: [
-    { value: "random", label: "Aleatório", emoji: "🎲" },
-    { value: "internacional", label: "Mundo", emoji: "🌍" },
-    { value: "economia", label: "Economia", emoji: "📈" },
-    { value: "politica", label: "Política", emoji: "🏛️" },
-    { value: "saude", label: "Saúde", emoji: "🏥" },
-    { value: "educacao", label: "Educação", emoji: "🎓" },
-    { value: "esportes", label: "Esportes", emoji: "⚽" },
-    { value: "justica", label: "Justiça", emoji: "⚖️" },
-    { value: "direitos-humanos", label: "Direitos Humanos", emoji: "🤝" },
+    { value: "random", label: "Aleatório", icon: "Shuffle" },
+    { value: "internacional", label: "Mundo", icon: "Globe" },
+    { value: "economia", label: "Economia", icon: "TrendingUp" },
+    { value: "politica", label: "Política", icon: "Landmark" },
+    { value: "saude", label: "Saúde", icon: "HeartPulse" },
+    { value: "educacao", label: "Educação", icon: "GraduationCap" },
+    { value: "esportes", label: "Esportes", icon: "Trophy" },
+    { value: "justica", label: "Justiça", icon: "Scale" },
+    { value: "direitos-humanos", label: "Direitos Humanos", icon: "HandHeart" },
   ],
 
   ui: {

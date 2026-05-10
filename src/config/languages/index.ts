@@ -8,7 +8,7 @@ export type Difficulty = "easy" | "medium" | "hard";
 export type Topic = {
   value: string;
   label: string;
-  emoji: string;
+  icon: string;
 };
 
 export type Feed = {
