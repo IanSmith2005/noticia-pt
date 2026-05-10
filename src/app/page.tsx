@@ -7,10 +7,12 @@ import {
   Newspaper, Sprout, Leaf, Trees, ArrowRight, Check, ChevronDown,
   Shuffle, Globe, TrendingUp, Landmark, HeartPulse, GraduationCap,
   Trophy, Scale, HandHeart, MapPin, Cpu, Palette, Sparkles, Loader2,
+  Mail,
   type LucideIcon,
 } from "lucide-react";
 import { LANGUAGES, DEFAULT_LANG, type LangCode } from "@/config/languages";
 import { Flag } from "@/components/Flag";
+import { DiscordIcon } from "@/components/DiscordIcon";
 
 const TOPIC_ICONS: Record<string, LucideIcon> = {
   Shuffle, Globe, TrendingUp, Landmark, HeartPulse, GraduationCap,
@@ -347,6 +349,24 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="relative max-w-3xl mx-auto px-6 pb-10 text-center">
+        <div className="flex items-center justify-center gap-2 mb-4">
+          <a
+            href="mailto:Feedbacknoticiapt@outlook.com?subject=Notícia%20PT%20feedback"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-line text-sm font-medium text-slate-700 hover:border-navy/30 hover:text-navy transition-all shadow-sm hover:shadow-md"
+          >
+            <Mail className="h-4 w-4" />
+            {lang === "pt" ? "Enviar feedback" : "Stuur feedback"}
+          </a>
+          <a
+            href="https://discord.gg/vPDnD2KR"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#5865F2] text-white text-sm font-medium hover:bg-[#4752c4] transition-all shadow-sm hover:shadow-md"
+          >
+            <DiscordIcon className="h-4 w-4" />
+            {lang === "pt" ? "Entrar no Discord" : "Join Discord"}
+          </a>
+        </div>
         <p className="text-xs text-slate-400">{config.ui.sourceCredit}</p>
       </footer>
     </main>
