@@ -2,9 +2,47 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence, useMotionValue, useTransform, animate } from "framer-motion";
 import { Newspaper, Clock, ExternalLink, ArrowRight, BookOpen, ListChecks, CheckCircle2, CircleSlash, CircleDot } from "lucide-react";
+import confetti from "canvas-confetti";
 import { LANGUAGES, DEFAULT_LANG, type LangCode } from "@/config/languages";
 import { Flag } from "@/components/Flag";
+
+function AnimatedScore({ value }: { value: number }) {
+  const count = useMotionValue(0);
+  const rounded = useTransform(count, (v) => Math.round(v));
+
+  useEffect(() => {
+    const controls = animate(count, value, { duration: 1.2, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] });
+    return controls.stop;
+  }, [count, value]);
+
+  return <motion.span>{rounded}</motion.span>;
+}
+
+function fireConfetti() {
+  const duration = 1500;
+  const end = Date.now() + duration;
+  const colors = ["#2563eb", "#f59e0b", "#10b981", "#f43f5e"];
+
+  (function frame() {
+    confetti({
+      particleCount: 3,
+      angle: 60,
+      spread: 55,
+      origin: { x: 0, y: 0.7 },
+      colors,
+    });
+    confetti({
+      particleCount: 3,
+      angle: 120,
+      spread: 55,
+      origin: { x: 1, y: 0.7 },
+      colors,
+    });
+    if (Date.now() < end) requestAnimationFrame(frame);
+  })();
+}
 
 type Question = {
   idx: number;
@@ -94,6 +132,9 @@ export default function WorkspacePage() {
     setScore(data.score);
     setChecking(false);
     setActiveTab("questions");
+    if (data.score === 100) {
+      setTimeout(() => fireConfetti(), 400);
+    }
   }
 
   const config = LANGUAGES[lang];
@@ -193,8 +234,15 @@ export default function WorkspacePage() {
           <div className="px-5 py-6 space-y-5">
             {/* Score Summary */}
             {score !== null && (
-              <div className="bg-white rounded-2xl p-5 border border-line shadow-sm">
-                <h3 className="font-serif font-bold text-navy text-2xl mb-2">{config.ui.result}: {score}%</h3>
+              <motion.div
+                initial={{ opacity: 0, y: -12, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ type: "spring", stiffness: 280, damping: 22 }}
+                className="bg-white rounded-2xl p-5 border border-line shadow-sm"
+              >
+                <h3 className="font-serif font-bold text-navy text-2xl mb-2">
+                  {config.ui.result}: <AnimatedScore value={score} />%
+                </h3>
                 <div className="flex flex-wrap gap-3 text-sm mt-2">
                   <span className="inline-flex items-center gap-1.5 text-emerald-700">
                     <CheckCircle2 className="h-4 w-4" /> {results?.filter((r) => r.result === "correct").length} {config.ui.correct}
@@ -212,7 +260,7 @@ export default function WorkspacePage() {
                 >
                   {config.ui.newArticle.replace(/\s*→\s*$/, "")} <ArrowRight className="h-4 w-4" />
                 </button>
-              </div>
+              </motion.div>
             )}
 
             {/* Question Cards */}

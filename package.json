@@ -12,6 +12,8 @@
     "@anthropic-ai/sdk": "^0.55.0",
     "@extractus/article-extractor": "^8.1.0",
     "autoprefixer": "^10.5.0",
+    "canvas-confetti": "^1.9.4",
+    "framer-motion": "^12.38.0",
     "he": "^1.2.0",
     "lucide-react": "^1.14.0",
     "next": "^16.2.4",
@@ -20,6 +22,7 @@
     "rss-parser": "^3.13.0"
   },
   "devDependencies": {
+    "@types/canvas-confetti": "^1.9.0",
     "@types/he": "^1.2.3",
     "@types/node": "^20",
     "@types/react": "^19",
