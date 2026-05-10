@@ -62,7 +62,7 @@ export const ptConfig: LanguageConfig = {
 
   difficultyMeta: {
     easy: { label: "Fácil", desc: "Perguntas em inglês · Fatos básicos", questionLang: "en" },
-    medium: { label: "Médio", desc: "Perguntas em português · Interpretação", questionLang: "native" },
+    medium: { label: "Médio", desc: "Perguntas em inglês · Interpretação", questionLang: "en" },
     hard: { label: "Difícil", desc: "Perguntas em português · Pensamento crítico", questionLang: "native" },
   },
 
@@ -76,7 +76,7 @@ Each object must have: idx (number starting at 1), text (string), relatedParagra
       easy: `Generate 4 comprehension questions in ENGLISH about this Brazilian Portuguese news article.
 Focus on: basic facts, who/what/where/when, main idea.
 Keep questions simple and direct.`,
-      medium: `Generate 5 comprehension questions in PORTUGUESE (Brazilian) about this news article.
+      medium: `Generate 5 comprehension questions in ENGLISH about this Brazilian Portuguese news article.
 Focus on: causes and effects, connections between ideas, what quotes mean, implications.
 Questions should require reading carefully, not just skimming.`,
       hard: `Generate 6 critical thinking questions in PORTUGUESE (Brazilian) about this news article.

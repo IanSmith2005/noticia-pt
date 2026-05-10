@@ -60,7 +60,7 @@ export const nlConfig: LanguageConfig = {
 
   difficultyMeta: {
     easy: { label: "Makkelijk", desc: "Vragen in het Engels · Basisfeiten", questionLang: "en" },
-    medium: { label: "Gemiddeld", desc: "Vragen in het Nederlands · Interpretatie", questionLang: "native" },
+    medium: { label: "Gemiddeld", desc: "Vragen in het Engels · Interpretatie", questionLang: "en" },
     hard: { label: "Moeilijk", desc: "Vragen in het Nederlands · Kritisch denken", questionLang: "native" },
   },
 
@@ -99,7 +99,7 @@ Each object must have: idx (number starting at 1), text (string), relatedParagra
       easy: `Generate 4 comprehension questions in ENGLISH about this Dutch news article.
 Focus on: basic facts, who/what/where/when, main idea.
 Keep questions simple and direct.`,
-      medium: `Generate 5 comprehension questions in DUTCH (Netherlands Dutch) about this news article.
+      medium: `Generate 5 comprehension questions in ENGLISH about this Dutch news article.
 Focus on: causes and effects, connections between ideas, what quotes mean, implications.
 Questions should require reading carefully, not just skimming.`,
       hard: `Generate 6 critical thinking questions in DUTCH (Netherlands Dutch) about this news article.
