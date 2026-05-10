@@ -122,7 +122,7 @@ export default function Home() {
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden" aria-hidden>
         <motion.div
           className="absolute h-[60vh] w-[60vw] rounded-full blur-[120px]"
-          style={{ background: "radial-gradient(circle, rgba(245, 158, 11, 0.5), transparent 70%)" }}
+          style={{ background: "radial-gradient(circle, rgba(245, 158, 11, 0.22), transparent 70%)" }}
           animate={{
             x: ["-15%", "30%", "-10%", "-15%"],
             y: ["-10%", "20%", "10%", "-10%"],
@@ -131,7 +131,7 @@ export default function Home() {
         />
         <motion.div
           className="absolute h-[55vh] w-[55vw] rounded-full blur-[120px]"
-          style={{ background: "radial-gradient(circle, rgba(37, 99, 235, 0.45), transparent 70%)", right: 0 }}
+          style={{ background: "radial-gradient(circle, rgba(37, 99, 235, 0.20), transparent 70%)", right: 0 }}
           animate={{
             x: ["20%", "-10%", "30%", "20%"],
             y: ["50%", "20%", "60%", "50%"],
@@ -140,7 +140,7 @@ export default function Home() {
         />
         <motion.div
           className="absolute h-[50vh] w-[50vw] rounded-full blur-[120px]"
-          style={{ background: "radial-gradient(circle, rgba(167, 139, 250, 0.35), transparent 70%)" }}
+          style={{ background: "radial-gradient(circle, rgba(167, 139, 250, 0.15), transparent 70%)" }}
           animate={{
             x: ["60%", "20%", "70%", "60%"],
             y: ["-20%", "40%", "10%", "-20%"],
