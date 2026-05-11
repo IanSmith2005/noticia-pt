@@ -48,8 +48,7 @@ export async function generateQuestions(
 export async function checkAnswers(
   articleContent: string,
   questions: { text: string }[],
-  answers: string[],
-  answerLangName: string = "any language"
+  answers: string[]
 ): Promise<AnswerResult[]> {
   const qa = questions.map((q, i) => `Q${i + 1}: ${q.text}\nA${i + 1}: ${answers[i] || "(no answer)"}`).join("\n\n");
 
@@ -58,7 +57,7 @@ export async function checkAnswers(
     max_tokens: 2048,
     system: `You are an educational assistant evaluating reading comprehension answers.
 
-The student is answering in ${answerLangName}. Grade based on whether they understood the article's CONTENT, not on their language production or grammar. Accept partial credit generously for answers that show the student grasped the right idea, even if expressed simply.
+Grade based on whether the student understood the article's CONTENT, not on language production or grammar. Accept partial credit generously for answers that show the student grasped the right idea, even if expressed simply or in a different language than the question.
 
 Return ONLY a valid JSON array. Each object: result ("correct"|"partly_correct"|"incorrect"), feedback (in English, 1-2 sentences), betterAnswer (in English, what a good answer would say).`,
     messages: [
