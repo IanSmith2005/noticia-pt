@@ -168,7 +168,7 @@ export default function WorkspacePage() {
     hard: "text-red-600 bg-red-100",
   };
 
-  const localeMap: Record<LangCode, string> = { pt: "pt-BR", nl: "nl-NL", ja: "ja-JP" };
+  const localeMap: Record<LangCode, string> = { pt: "pt-BR", nl: "nl-NL" };
 
   return (
     <div className="min-h-screen bg-grain flex flex-col">

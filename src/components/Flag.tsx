@@ -22,12 +22,6 @@ const FLAGS: Record<LangCode, React.ReactElement> = {
       <rect y="28" width="60" height="14" fill="#21468b" />
     </svg>
   ),
-  ja: (
-    <svg viewBox="0 0 60 42" xmlns="http://www.w3.org/2000/svg" aria-label="Japanese flag">
-      <rect width="60" height="42" fill="#fff" />
-      <circle cx="30" cy="21" r="12" fill="#bc002d" />
-    </svg>
-  ),
 };
 
 export function Flag({ code, className = "h-4 w-6" }: { code: LangCode; className?: string }) {

@@ -36,7 +36,7 @@ const DIFFICULTY_STYLES: Record<Diff, {
   hard: { border: "border-rose-200", iconBg: "bg-rose-100", iconText: "text-rose-700", ring: "ring-rose-300", text: "text-rose-900" },
 };
 
-const DATE_LOCALE: Record<LangCode, string> = { pt: "pt-BR", nl: "nl-NL", ja: "ja-JP" };
+const DATE_LOCALE: Record<LangCode, string> = { pt: "pt-BR", nl: "nl-NL" };
 
 // Stagger config for entrance
 const EASE = [0.22, 1, 0.36, 1] as [number, number, number, number];
@@ -184,7 +184,7 @@ export default function Home() {
                 uiLang === "native" ? "bg-navy text-white" : "text-slate-500 hover:text-slate-700"
               }`}
             >
-              {lang === "pt" ? "PT" : lang === "nl" ? "NL" : "JP"}
+              {lang === "pt" ? "PT" : "NL"}
             </button>
             <button
               onClick={() => changeUiLang("en")}

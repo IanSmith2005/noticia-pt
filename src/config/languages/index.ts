@@ -1,8 +1,9 @@
 import { ptConfig } from "./pt";
 import { nlConfig } from "./nl";
-import { jaConfig } from "./ja";
+// Japanese disabled: NHK requires JWT auth and full article body isn't accessible to scrapers.
+// import { jaConfig } from "./ja";
 
-export type LangCode = "pt" | "nl" | "ja";
+export type LangCode = "pt" | "nl";
 
 export type Difficulty = "easy" | "medium" | "hard";
 
@@ -71,12 +72,11 @@ export type LanguageConfig = {
 export const LANGUAGES: Record<LangCode, LanguageConfig> = {
   pt: ptConfig,
   nl: nlConfig,
-  ja: jaConfig,
 };
 
 export const DEFAULT_LANG: LangCode = "pt";
 
 export function getConfig(code: string | null | undefined): LanguageConfig {
-  if (code && (code === "pt" || code === "nl" || code === "ja")) return LANGUAGES[code];
+  if (code && (code === "pt" || code === "nl")) return LANGUAGES[code];
   return LANGUAGES[DEFAULT_LANG];
 }
