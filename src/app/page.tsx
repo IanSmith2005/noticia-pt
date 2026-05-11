@@ -11,6 +11,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { LANGUAGES, DEFAULT_LANG, type LangCode } from "@/config/languages";
+import { getUi, getDifficultyMeta, getTopicLabel, getHeroStrings, getSummary, type UiLang } from "@/config/englishUi";
 import { Flag } from "@/components/Flag";
 import { DiscordIcon } from "@/components/DiscordIcon";
 
@@ -51,6 +52,7 @@ const itemVariants = {
 export default function Home() {
   const router = useRouter();
   const [lang, setLang] = useState<LangCode>(DEFAULT_LANG);
+  const [uiLang, setUiLang] = useState<UiLang>("native");
   const [topic, setTopic] = useState("random");
   const [difficulty, setDifficulty] = useState<Diff>("medium");
   const [loading, setLoading] = useState(false);
@@ -61,9 +63,13 @@ export default function Home() {
   useEffect(() => {
     const saved = localStorage.getItem("lang") as LangCode | null;
     if (saved && saved in LANGUAGES) setLang(saved);
+    const savedUi = localStorage.getItem("uiLang") as UiLang | null;
+    if (savedUi === "en" || savedUi === "native") setUiLang(savedUi);
   }, []);
 
   const config = LANGUAGES[lang];
+  const ui = getUi(config, uiLang);
+  const hero = getHeroStrings(config, uiLang);
 
   function changeLang(newLang: LangCode) {
     setLang(newLang);
@@ -72,23 +78,28 @@ export default function Home() {
     setLangOpen(false);
   }
 
+  function changeUiLang(next: UiLang) {
+    setUiLang(next);
+    localStorage.setItem("uiLang", next);
+  }
+
   async function handleStart() {
     setLoading(true);
     setError("");
-    setLoadingMsg(config.ui.loadingArticle);
+    setLoadingMsg(ui.loadingArticle);
 
     try {
       const res = await fetch(`/api/articles?topic=${topic}&lang=${lang}`);
       const articles = await res.json();
 
       if (!articles.length) {
-        setError(config.ui.notFound);
+        setError(ui.notFound);
         setLoading(false);
         return;
       }
 
       const article = articles[0];
-      setLoadingMsg(config.ui.loadingQuestions);
+      setLoadingMsg(ui.loadingQuestions);
 
       const exRes = await fetch("/api/exercise", {
         method: "POST",
@@ -97,10 +108,10 @@ export default function Home() {
       });
       const { questions } = await exRes.json();
 
-      sessionStorage.setItem("exercise", JSON.stringify({ article, questions, difficulty, lang }));
+      sessionStorage.setItem("exercise", JSON.stringify({ article, questions, difficulty, lang, uiLang }));
       router.push("/workspace");
     } catch {
-      setError(config.ui.notFound);
+      setError(ui.notFound);
       setLoading(false);
     }
   }
@@ -112,13 +123,7 @@ export default function Home() {
     });
   }, [lang]);
 
-  const selectedTopicLabel = config.topics.find((t) => t.value === topic)?.label ?? "";
-  const summaryText =
-    lang === "pt"
-      ? `Você lerá um artigo de ${selectedTopicLabel.toLowerCase()} com perguntas de nível ${config.difficultyMeta[difficulty].label.toLowerCase()}.`
-      : lang === "nl"
-      ? `Je leest een artikel over ${selectedTopicLabel.toLowerCase()} met vragen op ${config.difficultyMeta[difficulty].label.toLowerCase()} niveau.`
-      : `${config.difficultyMeta[difficulty].label}レベルの「${selectedTopicLabel}」記事を読みます。`;
+  const summaryText = getSummary(config, uiLang, topic, difficulty);
 
   return (
     <main className="min-h-screen bg-grain relative overflow-hidden">
@@ -165,6 +170,32 @@ export default function Home() {
           <span className="capitalize">{today}</span>
         </motion.div>
 
+        <div className="flex items-center gap-3">
+          {/* UI language toggle */}
+          <motion.div
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="flex bg-white border border-line rounded-full p-0.5 shadow-sm"
+          >
+            <button
+              onClick={() => changeUiLang("native")}
+              className={`px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider transition-all ${
+                uiLang === "native" ? "bg-navy text-white" : "text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              {lang === "pt" ? "PT" : lang === "nl" ? "NL" : "JP"}
+            </button>
+            <button
+              onClick={() => changeUiLang("en")}
+              className={`px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider transition-all ${
+                uiLang === "en" ? "bg-navy text-white" : "text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              EN
+            </button>
+          </motion.div>
+
         <motion.div
           initial={{ opacity: 0, x: 8 }}
           animate={{ opacity: 1, x: 0 }}
@@ -208,6 +239,7 @@ export default function Home() {
             )}
           </AnimatePresence>
         </motion.div>
+        </div>
       </header>
 
       {/* Form OR loading skeleton */}
@@ -224,13 +256,13 @@ export default function Home() {
             <section className="relative max-w-3xl mx-auto px-6 pt-12 pb-8 text-center">
               <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-line text-xs font-semibold text-slate-500 uppercase tracking-wider mb-6 shadow-sm">
                 <Newspaper className="h-3.5 w-3.5 text-accent" />
-                {lang === "pt" ? "Leitura Diária" : lang === "nl" ? "Dagelijkse Lezing" : "毎日の読書"}
+                {hero.dailyReading}
               </motion.div>
               <motion.h1 variants={itemVariants} className="font-serif text-6xl md:text-7xl font-bold text-navy leading-[0.95] mb-4">
-                {config.brand}
+                {ui.brand}
               </motion.h1>
               <motion.p variants={itemVariants} className="font-serif italic text-xl text-slate-500">
-                {config.tagline}
+                {ui.tagline}
               </motion.p>
             </section>
 
@@ -239,11 +271,11 @@ export default function Home() {
               {/* Difficulty */}
               <motion.div variants={itemVariants} className="mb-8">
                 <h2 className="text-xs font-bold text-slate-400 uppercase tracking-[0.18em] mb-3">
-                  {config.ui.difficulty}
+                  {ui.difficulty}
                 </h2>
                 <div className="grid grid-cols-3 gap-3">
                   {(["easy", "medium", "hard"] as const).map((d) => {
-                    const meta = config.difficultyMeta[d];
+                    const meta = getDifficultyMeta(config, uiLang, d);
                     const s = DIFFICULTY_STYLES[d];
                     const Icon = DIFFICULTY_ICONS[d];
                     const active = difficulty === d;
@@ -283,7 +315,7 @@ export default function Home() {
               {/* Topic */}
               <motion.div variants={itemVariants} className="mb-8">
                 <h2 className="text-xs font-bold text-slate-400 uppercase tracking-[0.18em] mb-3">
-                  {config.ui.topic}
+                  {ui.topic}
                 </h2>
                 <div className="flex flex-wrap gap-2">
                   {config.topics.map((t) => {
@@ -303,7 +335,7 @@ export default function Home() {
                         }`}
                       >
                         <Icon className="h-4 w-4" strokeWidth={2} />
-                        {t.label}
+                        {getTopicLabel(config, uiLang, t.value)}
                       </motion.button>
                     );
                   })}
@@ -338,7 +370,7 @@ export default function Home() {
                   transition={{ type: "spring", stiffness: 400, damping: 22 }}
                   className="group inline-flex items-center gap-2 px-8 py-4 bg-navy text-white font-semibold text-base rounded-2xl shadow-lg"
                 >
-                  {config.ui.startButton.replace(/\s*→\s*$/, "")}
+                  {ui.startButton.replace(/\s*→\s*$/, "")}
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </motion.button>
               </motion.div>
@@ -357,7 +389,7 @@ export default function Home() {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-line text-sm font-medium text-slate-700 hover:border-navy/30 hover:text-navy transition-all shadow-sm hover:shadow-md"
           >
             <Mail className="h-4 w-4" />
-            {lang === "pt" ? "Enviar feedback" : lang === "nl" ? "Stuur feedback" : "フィードバックを送る"}
+            {hero.sendFeedback}
           </a>
           <a
             href="https://discord.gg/vPDnD2KR"
@@ -366,10 +398,10 @@ export default function Home() {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#5865F2] text-white text-sm font-medium hover:bg-[#4752c4] transition-all shadow-sm hover:shadow-md"
           >
             <DiscordIcon className="h-4 w-4" />
-            {lang === "pt" ? "Entrar no Discord" : lang === "nl" ? "Join Discord" : "Discordに参加"}
+            {hero.joinDiscord}
           </a>
         </div>
-        <p className="text-xs text-slate-400">{config.ui.sourceCredit}</p>
+        <p className="text-xs text-slate-400">{ui.sourceCredit}</p>
       </footer>
     </main>
   );
