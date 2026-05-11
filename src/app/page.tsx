@@ -7,7 +7,7 @@ import {
   Newspaper, Sprout, Leaf, Trees, ArrowRight, Check, ChevronDown,
   Shuffle, Globe, TrendingUp, Landmark, HeartPulse, GraduationCap,
   Trophy, Scale, HandHeart, MapPin, Cpu, Palette, Sparkles, Loader2,
-  Mail,
+  Mail, Users,
   type LucideIcon,
 } from "lucide-react";
 import { LANGUAGES, DEFAULT_LANG, type LangCode } from "@/config/languages";
@@ -16,7 +16,7 @@ import { DiscordIcon } from "@/components/DiscordIcon";
 
 const TOPIC_ICONS: Record<string, LucideIcon> = {
   Shuffle, Globe, TrendingUp, Landmark, HeartPulse, GraduationCap,
-  Trophy, Scale, HandHeart, MapPin, Cpu, Palette,
+  Trophy, Scale, HandHeart, MapPin, Cpu, Palette, Users, Newspaper,
 };
 
 type Diff = "easy" | "medium" | "hard";
@@ -35,7 +35,7 @@ const DIFFICULTY_STYLES: Record<Diff, {
   hard: { border: "border-rose-200", iconBg: "bg-rose-100", iconText: "text-rose-700", ring: "ring-rose-300", text: "text-rose-900" },
 };
 
-const DATE_LOCALE: Record<LangCode, string> = { pt: "pt-BR", nl: "nl-NL" };
+const DATE_LOCALE: Record<LangCode, string> = { pt: "pt-BR", nl: "nl-NL", ja: "ja-JP" };
 
 // Stagger config for entrance
 const EASE = [0.22, 1, 0.36, 1] as [number, number, number, number];
@@ -116,7 +116,9 @@ export default function Home() {
   const summaryText =
     lang === "pt"
       ? `Você lerá um artigo de ${selectedTopicLabel.toLowerCase()} com perguntas de nível ${config.difficultyMeta[difficulty].label.toLowerCase()}.`
-      : `Je leest een artikel over ${selectedTopicLabel.toLowerCase()} met vragen op ${config.difficultyMeta[difficulty].label.toLowerCase()} niveau.`;
+      : lang === "nl"
+      ? `Je leest een artikel over ${selectedTopicLabel.toLowerCase()} met vragen op ${config.difficultyMeta[difficulty].label.toLowerCase()} niveau.`
+      : `${config.difficultyMeta[difficulty].label}レベルの「${selectedTopicLabel}」記事を読みます。`;
 
   return (
     <main className="min-h-screen bg-grain relative overflow-hidden">
@@ -222,7 +224,7 @@ export default function Home() {
             <section className="relative max-w-3xl mx-auto px-6 pt-12 pb-8 text-center">
               <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-line text-xs font-semibold text-slate-500 uppercase tracking-wider mb-6 shadow-sm">
                 <Newspaper className="h-3.5 w-3.5 text-accent" />
-                {lang === "pt" ? "Leitura Diária" : "Dagelijkse Lezing"}
+                {lang === "pt" ? "Leitura Diária" : lang === "nl" ? "Dagelijkse Lezing" : "毎日の読書"}
               </motion.div>
               <motion.h1 variants={itemVariants} className="font-serif text-6xl md:text-7xl font-bold text-navy leading-[0.95] mb-4">
                 {config.brand}
@@ -355,7 +357,7 @@ export default function Home() {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-line text-sm font-medium text-slate-700 hover:border-navy/30 hover:text-navy transition-all shadow-sm hover:shadow-md"
           >
             <Mail className="h-4 w-4" />
-            {lang === "pt" ? "Enviar feedback" : "Stuur feedback"}
+            {lang === "pt" ? "Enviar feedback" : lang === "nl" ? "Stuur feedback" : "フィードバックを送る"}
           </a>
           <a
             href="https://discord.gg/vPDnD2KR"
@@ -364,7 +366,7 @@ export default function Home() {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#5865F2] text-white text-sm font-medium hover:bg-[#4752c4] transition-all shadow-sm hover:shadow-md"
           >
             <DiscordIcon className="h-4 w-4" />
-            {lang === "pt" ? "Entrar no Discord" : "Join Discord"}
+            {lang === "pt" ? "Entrar no Discord" : lang === "nl" ? "Join Discord" : "Discordに参加"}
           </a>
         </div>
         <p className="text-xs text-slate-400">{config.ui.sourceCredit}</p>

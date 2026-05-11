@@ -91,6 +91,7 @@ export default function WorkspacePage() {
   const [checking, setChecking] = useState(false);
   const [activeTab, setActiveTab] = useState<"article" | "questions">("article");
   const [highlightedPara, setHighlightedPara] = useState<number | null>(null);
+  const [answerLang, setAnswerLang] = useState<"native" | "en">("en");
   const paraRefs = useRef<(HTMLParagraphElement | null)[]>([]);
 
   useEffect(() => {
@@ -102,7 +103,14 @@ export default function WorkspacePage() {
     setDifficulty(data.difficulty);
     setLang(data.lang || DEFAULT_LANG);
     setAnswers(new Array(data.questions.length).fill(""));
+    const savedAnswerLang = localStorage.getItem("answerLang") as "native" | "en" | null;
+    if (savedAnswerLang === "native" || savedAnswerLang === "en") setAnswerLang(savedAnswerLang);
   }, [router]);
+
+  function changeAnswerLang(next: "native" | "en") {
+    setAnswerLang(next);
+    localStorage.setItem("answerLang", next);
+  }
 
   function highlightParagraph(paraIdx: number) {
     setHighlightedPara(paraIdx);
@@ -125,6 +133,8 @@ export default function WorkspacePage() {
         articleContent: article.content,
         questions,
         answers,
+        answerLang,
+        lang,
       }),
     });
     const data = await res.json();
@@ -158,7 +168,7 @@ export default function WorkspacePage() {
     hard: "text-red-600 bg-red-100",
   };
 
-  const localeMap: Record<LangCode, string> = { pt: "pt-BR", nl: "nl-NL" };
+  const localeMap: Record<LangCode, string> = { pt: "pt-BR", nl: "nl-NL", ja: "ja-JP" };
 
   return (
     <div className="min-h-screen bg-grain flex flex-col">
@@ -232,6 +242,31 @@ export default function WorkspacePage() {
         {/* Questions Panel */}
         <div className={`${activeTab === "questions" ? "flex" : "hidden"} md:flex flex-col w-full md:w-2/5 overflow-y-auto thin-scroll`}>
           <div className="px-5 py-6 space-y-5">
+            {/* Answer language toggle */}
+            {!results && (
+              <div className="flex items-center justify-between bg-white border border-line rounded-xl px-3 py-2 text-xs">
+                <span className="text-slate-500 font-medium">{config.ui.answerInLabel}</span>
+                <div className="flex bg-slate-100 rounded-lg p-0.5">
+                  <button
+                    onClick={() => changeAnswerLang("native")}
+                    className={`px-3 py-1 rounded-md font-semibold transition-all ${
+                      answerLang === "native" ? "bg-white text-navy shadow-sm" : "text-slate-500 hover:text-slate-700"
+                    }`}
+                  >
+                    {config.label}
+                  </button>
+                  <button
+                    onClick={() => changeAnswerLang("en")}
+                    className={`px-3 py-1 rounded-md font-semibold transition-all ${
+                      answerLang === "en" ? "bg-white text-navy shadow-sm" : "text-slate-500 hover:text-slate-700"
+                    }`}
+                  >
+                    English
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Score Summary */}
             {score !== null && (
               <motion.div
@@ -295,7 +330,7 @@ export default function WorkspacePage() {
                         updated[i] = e.target.value;
                         setAnswers(updated);
                       }}
-                      placeholder={difficulty === "easy" ? "Write your answer here..." : config.ui.answerPlaceholder}
+                      placeholder={answerLang === "en" ? config.ui.answerPlaceholderEn : config.ui.answerPlaceholder}
                       className="w-full text-sm border border-line rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent resize-none bg-slate-50"
                     />
                   ) : (
