@@ -76,7 +76,7 @@ export async function fetchArticleContent(
           .trim()
       )
     );
-    if (text.length >= 300) return text.slice(0, 8000);
+    if (text.length >= 180) return text.slice(0, 8000);
   }
 
   // Fallback: tag-strip with proper entity decoding
@@ -95,7 +95,7 @@ export async function fetchArticleContent(
     )
   );
 
-  if (fallback.length < 300) throw new Error("Content too short");
+  if (fallback.length < 180) throw new Error("Content too short");
   return fallback.slice(0, 8000);
 }
 

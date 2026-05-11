@@ -68,18 +68,13 @@ export const jaConfig: LanguageConfig = {
   },
 
   cleanContent: (text) => {
-    let t = text;
-    // Strip common NHK boilerplate phrases
-    t = t.replace(/\s*このページの先頭へ\s*/g, "");
-    t = t.replace(/\s*NHK NEWS WEB\s*/g, "");
-    t = t.replace(/\s*関連ニュース\s*/g, "");
-    t = t.replace(/\s*続きを読む\s*/g, "");
-    // Cut at "あわせて読みたい" (also recommended) if it appears
-    const markers = ["あわせて読みたい", "関連ニュース", "おすすめ記事", "注目のコンテンツ"];
+    let t = text.trim();
+    // Cut at NHK-specific end-of-article markers, only if they appear well past the start
+    const markers = ["あわせて読みたい", "おすすめ記事", "注目のコンテンツ", "ページの先頭へ"];
     let cutAt = t.length;
     for (const m of markers) {
       const idx = t.indexOf(m);
-      if (idx > 0 && idx < cutAt) cutAt = idx;
+      if (idx > 200 && idx < cutAt) cutAt = idx;
     }
     return t.slice(0, cutAt).trim();
   },
