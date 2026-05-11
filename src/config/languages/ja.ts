@@ -69,12 +69,28 @@ export const jaConfig: LanguageConfig = {
 
   cleanContent: (text) => {
     let t = text.trim();
-    // Cut at NHK-specific end-of-article markers, only if they appear well past the start
-    const markers = ["あわせて読みたい", "おすすめ記事", "注目のコンテンツ", "ページの先頭へ"];
+
+    // Strip NHK leading nav menu by cutting up to the first article timestamp
+    // (NHK timestamps look like "2026年5月11日6:06" or "2026年5月11日6:06 (2026年5月11日14:25更新)")
+    const tsMatch = t.match(/\d{4}年\d{1,2}月\d{1,2}日\d{1,2}:\d{2}(?:\s*\(\d{4}年\d{1,2}月\d{1,2}日\d{1,2}:\d{2}\s*更新\))?/);
+    if (tsMatch && tsMatch.index !== undefined && tsMatch.index < 600) {
+      t = t.slice(tsMatch.index + tsMatch[0].length).trim();
+    }
+
+    // Cut at NHK end-of-article markers (related tags, etc.)
+    const markers = [
+      "注目ワード",
+      "あわせて読みたい",
+      "おすすめ記事",
+      "注目のコンテンツ",
+      "関連ニュース",
+      "関連リンク",
+      "ページの先頭へ",
+    ];
     let cutAt = t.length;
     for (const m of markers) {
       const idx = t.indexOf(m);
-      if (idx > 200 && idx < cutAt) cutAt = idx;
+      if (idx > 50 && idx < cutAt) cutAt = idx;
     }
     return t.slice(0, cutAt).trim();
   },
